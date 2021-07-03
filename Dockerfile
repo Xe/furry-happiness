@@ -17,9 +17,10 @@ RUN apt-get update \
  && cd .. \
  && rm -rf ${LINUX_VERSION}
 
-FROM xena/alpine
+FROM debian:testing-slim
 
-ADD https://xena.greedo.xeserv.us/files/slirp /slirp
+# Add slirp
+RUN apt-get update && apt-get install --no-install-recommends -y slirp wget && rm -rf /var/lib/apt/lists/*
 
 # Add Tini
 ENV TINI_VERSION v0.19.0
@@ -30,8 +31,10 @@ RUN wget -O - http://dl-cdn.alpinelinux.org/alpine/v3.12/releases/x86_64/alpine-
 
 COPY --from=build /linux /linux
 COPY init.sh /chroot/init.sh
-COPY resolv.conf /chroot/etc/resolv.conf
-RUN chmod +x /linux /slirp /chroot/tini
+
+RUN chmod +x /linux /chroot/tini && echo "nameserver 10.0.2.3" > /chroot/etc/resolv.conf
 
 COPY runlinux.sh /runlinux.sh
-CMD /runlinux.sh
+
+ENTRYPOINT [ "/runlinux.sh" ]
+
