@@ -27,12 +27,12 @@ ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /chroot/tini
 
 # Set up chroot
-RUN wget -O - http://dl-cdn.alpinelinux.org/alpine/v3.12/releases/x86_64/alpine-minirootfs-3.12.7-x86_64.tar.gz | tar xz -C /chroot
+RUN wget -O - http://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-minirootfs-3.14.0-x86_64.tar.gz | tar xz -C /chroot
 
 COPY --from=build /linux /linux
 COPY init.sh /chroot/init.sh
 
-RUN chmod +x /linux /chroot/tini && echo "nameserver 10.0.2.3" > /chroot/etc/resolv.conf
+RUN chmod +x /linux /chroot/tini && echo "nameserver 10.0.2.3" > /chroot/etc/resolv.conf && sed -i 's/https/http/g' /chroot/etc/apk/repositories
 
 COPY runlinux.sh /runlinux.sh
 
